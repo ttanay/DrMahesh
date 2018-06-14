@@ -50,7 +50,7 @@ var transporter = nodemailer.createTransport({
 
 var mailOptions = {
   from: credentials.username,
-  to: 'tanayrao007@gmail.com',
+  to: '<DR MAHESH EMAIL>',
   subject: 'Unfilled surveys',
 }
 
