@@ -10,61 +10,36 @@ mongoose.connect('mongodb://localhost:27017/lattice');
 
 //Schemas
 var patientSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  prescription_date: Date,
-  responses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Response'}],
-});
-var responseSchema = new mongoose.Schema({
-  created_on: Date,
-  response_text: String,
-  patient: {type: mongoose.Schema.Types.ObjectId, ref: 'Patient'}
+  prescriptionDate: Date,
+  response: {
+    createdOn: Date,
+    responseText: String,
+  },
 });
 
 var Patient = mongoose.model('Patient', patientSchema);
-var Response = mongoose.model('Response', responseSchema);
 
-//POPULATE
-var p0 = new Patient({
-  _id: mongoose.Types.ObjectId(),
-  prescription_date: new Date(2018, 01, Math.floor(Math.random()*10))
-});
-p0.save((err) => {
-  if(err) console.log(err)
 
-  var resp0 = new Response({
-    created_on: new Date(2018, 01 + Math.floor(Math.random()*3), Math.floor(Math.random()*10)),
-    response_text: 'p' + Math.floor(Math.random()*10),
-    patient: p0._id
+//GENRATOR FN
+function populateDB(){
+  let patient = Patient({
+    prescriptionDate: new Date(2018, 01, Math.floor(Math.random()*10)),
+    response: {
+      createdOn: new Date(2018, 01 + Math.floor(Math.random()*3), 10 + Math.floor(Math.random()*10)),
+      responseText: 'response',
+    }
   });
 
-  resp0.save((err) => {
+  patient.save(function (err){
     if (err) console.log(err)
-  });
-  this.responses: [resp0]
-});
-
-console.log(credentials)
-
-var getValidPatients = () => {
-
-  let validPatients = [];
-
-  Patient.find({}, (err, patients) => {
-    patients.forEach((patient) => {
-      console.log(patient);
-      /*let recentResponse = patient.responses[0];
-      patient.responses.forEach((response) => {
-        if (response > recentResponse)
-          recentResponse = response
-      })*/
-    });
   });
 }
 
-console.log(getValidPatients());
 
+for(let i = 0; i < 15; i++)
+  populateDB();
 
-//
+//EMAIL
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -81,16 +56,28 @@ var mailOptions = {
 
 //Routes
 app.get('/sendmail/', (req, res) => {
-  var unfilled = getSurveyPatients();
-  mailOptions.html = JSON.stringify({data: unfilled});
-  res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify({data: unfilled}))
-  transporter.sendMail(mailOptions, (err, info) => {
-    if(err)
-      console.log(err);
-    else
-      console.log(info);
+
+  let unfilled = [];
+
+  Patient.find({}).exec((err, patients) => {
+    patients.forEach(function(patient) {
+      daysSincePrescription = patient.response.createdOn - patient.prescriptionDate;
+      daysSincePrescription = daysSincePrescription / (1000 * 3600 * 24);
+      if(daysSincePrescription > 35){
+        unfilled.push(patient);
+      }
+    });
+    mailOptions.html = JSON.stringify({data: unfilled});
+		res.setHeader('Content-Type', 'application/json');
+  	res.send(JSON.stringify({data: unfilled}))
+  	transporter.sendMail(mailOptions, (err, info) => {
+    	if(err)
+      	console.log(err);
+    	else
+      	console.log(info);
+  	});
   });
+
 });
 
 //Listen
