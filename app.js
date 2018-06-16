@@ -47,6 +47,24 @@ var connection = mysql.createConnection({
   database: 'lattice',
 });
 
+/*DB SCHEMA
+ * patients:
+ *  ->patient_id
+ *  ->prescription_date
+ *
+ * responses:
+ *  ->response_id
+ *  ->patient_id
+ *  ->created_on
+ *
+ * response_details
+ *  ->response_id
+ *  ->response_text
+ *
+ */
+
+
+
 connection.connect();
 
 
@@ -61,8 +79,8 @@ var transporter = nodemailer.createTransport({
 
 var mailOptions = {
   from: credentials.username,
-  to: 'tanayrao007@gmail.com',
-  subject: 'Unfilled surveys',
+  to: '<DR MAHESH EMAIL>',
+  subject: 'Unfilled surveys by Tanay',
 }
 
 //Routes
