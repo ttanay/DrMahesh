@@ -1,7 +1,7 @@
 {
   "name": "lattice",
   "version": "1.0.0",
-  "description": "",
+  "description": "Solution to Dr Mahesh's patient survey woes.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,15 @@
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "mongoose": "^5.1.5",
+    "mysql": "^2.15.0",
     "nodemailer": "^4.6.6"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ttanay/DrMahesh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ttanay/DrMahesh/issues"
+  },
+  "homepage": "https://github.com/ttanay/DrMahesh#readme"
 }
