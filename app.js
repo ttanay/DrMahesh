@@ -10,14 +10,15 @@ var cleanResult = function(current, result){
   current = {
     patient_id: result.patient_id,
     prescription_date: result.prescription_date,
-    responses: [
-      {
+    responses: [],
+  };
+	if(result.response_id != null){
+			current.responses.push({
         response_id: result.response_id,
         created_on: result.created_on,
         text: result.response_text,
-      }
-    ]
-  };
+      });
+	}
   return current;
 };
 
@@ -88,7 +89,7 @@ app.get('/sendmail/', (req, res) => {
 
   let unfilled = {};
 
-  connection.query('select distinct responses.response_id, responses.patient_id, created_on, prescription_date, response_details.response_text from responses inner join patients on responses.patient_id = patients.patient_id inner join response_details on responses.response_id = response_details.response_id order by responses.patient_id;', (error, results, fields) => {
+  connection.query('select distinct responses.response_id, patients.patient_id, created_on, prescription_date, response_text from patients left join responses on responses.patient_id = patients.patient_id left join response_details on responses.response_id = response_details.response_id order by patients.patient_id;', (error, results, fields) => {
     let data = [];
     let current = null;
     results.forEach((result) => {
